@@ -15,6 +15,7 @@ import dagger.hilt.android.scopes.ActivityScoped
 import dagger.hilt.android.scopes.FragmentScoped
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Inject
+import javax.inject.Qualifier
 import javax.inject.Singleton
 
 @AndroidEntryPoint
@@ -25,29 +26,34 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        println(someClass.doAThing())
+        println(someClass.doAThing1())
+        println(someClass.doAThing2())
     }
 }
 
 class SomeClass
 @Inject
 constructor(
-    private val someInterfaceImpl: SomeInterface,
-    private val gson: Gson
-
+    @Impl1 private val someInterfaceImpl1: SomeInterface,
+    @Impl2 private val someInterfaceImpl2: SomeInterface,
 ) {
 
-    fun doAThing(): String {
+    fun doAThing1(): String {
 
-        return "Look I got a ${someInterfaceImpl.getAThing()}"
+        return "Look I got a ${someInterfaceImpl1.getAThing()}"
+    }
+
+    fun doAThing2(): String {
+
+        return "Look I got a ${someInterfaceImpl2.getAThing()}"
     }
 }
 
-class SomeInterfaceImpl
+class SomeInterfaceImpl1
 @Inject
 constructor() : SomeInterface {
     override fun getAThing(): String {
-        return "A Thing"
+        return "A Thing1"
     }
 }
 
@@ -57,25 +63,40 @@ interface SomeInterface {
 
 }
 
+class SomeInterfaceImpl2
+@Inject
+constructor() : SomeInterface {
+    override fun getAThing(): String {
+        return "A Thing2"
+    }
+}
+
 
 @InstallIn(SingletonComponent::class)
 @Module
 class MyModules {
 
+    @Impl1
     @Singleton
     @Provides
-    fun provideSomeInterface(): SomeInterface {
+    fun provideSomeInterface1(): SomeInterface {
 
-        return SomeInterfaceImpl()
+        return SomeInterfaceImpl1()
     }
 
+    @Impl2
     @Singleton
     @Provides
-    fun provideSomeGson() : Gson {
+    fun provideSomeInterface2(): SomeInterface {
 
-        return Gson()
+        return SomeInterfaceImpl2()
     }
 }
 
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class Impl1
 
-
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class Impl2
