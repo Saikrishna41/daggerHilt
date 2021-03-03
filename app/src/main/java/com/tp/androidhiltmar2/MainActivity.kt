@@ -1,13 +1,18 @@
 package com.tp.androidhiltmar2
 
+import android.app.Application
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.PersistableBundle
 import androidx.fragment.app.Fragment
 import com.google.gson.Gson
+import dagger.Binds
+import dagger.Module
+import dagger.hilt.InstallIn
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.scopes.ActivityScoped
 import dagger.hilt.android.scopes.FragmentScoped
+import dagger.hilt.components.SingletonComponent
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -26,15 +31,13 @@ class MainActivity : AppCompatActivity() {
 class SomeClass
 @Inject
 constructor(
-   // private val someInterfaceImpl: SomeInterface,
-    private val gson : Gson
+    private val someInterfaceImpl: SomeInterface
+
 ) {
 
     fun doAThing(): String {
 
-        return "gson"
-
-       // return "Look I got ${someInterfaceImpl.getAThing()}"
+       return "Look I got a ${someInterfaceImpl.getAThing()}"
     }
 }
 
@@ -50,4 +53,13 @@ interface SomeInterface {
 
     fun getAThing(): String
 
+}
+
+@InstallIn(SingletonComponent::class)
+@Module
+abstract class MyModule
+{
+    @Singleton
+    @Binds
+    abstract fun bindSomeDependency(someImpl : SomeInterfaceImpl) : SomeInterface
 }
